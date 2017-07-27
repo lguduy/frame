@@ -96,7 +96,7 @@ def convert_to_TFRecord(images, labels, save_dir, name):
     ----------
         images : list of image path, string
         labels : list of labels, int
-        save_dir : the directory to save TFRecord file, e.g.: '/home/liangyu/'
+        save_dir : the directory to save TFRecord file'
         name : the name of TFRecord file, string, e.g.: 'train'
 
     Returns:

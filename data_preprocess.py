@@ -1,8 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-Created on 2017/6/27 22:08
-
 数据：excel表格，火焰图像对应的传感器测量的过程变量
 
 @author: liangyu
@@ -90,7 +88,7 @@ axes.set_ylim(0, 8)
 # save
 plt.savefig('./figure_', dpi = 1000)
 
-# 
+#
 use_data_remove_match['label'] = -1
 
 for i in range(use_data_remove_match.shape[0]):

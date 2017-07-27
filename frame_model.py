@@ -136,6 +136,7 @@ def inference(images, batch_size, n_classes, visualize):
 
 def losses(logits, labels):
     """Compute loss from logits and labels, loss function
+
     Parameters:
     -----------
         logits: output tensor of model, float, [batch_size, n_classes]
@@ -158,8 +159,8 @@ def losses(logits, labels):
 
 def trainning(loss, learning_rate):
     """Training op, the op returned by this function is what must be passed to
-        'sess.run()' call to cause the model to train
-        define a optimizer
+        'sess.run()' call to cause the model to train.
+        Define a optimizer.
 
     Parameters:
     -----------
