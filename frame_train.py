@@ -36,7 +36,11 @@ def training():
     # logs path
     logs_train_dir = os.path.join(project_dir, 'logs', 'train/')
     logs_val_dir = os.path.join(project_dir, 'logs', 'val/')
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
     # batch data
     train_img_batch, train_label_batch = read_and_decode(train_data_path,
                                                          batch_size=BATCH_SIZE,
@@ -55,7 +59,11 @@ def training():
 
     # init op
     init_op = tf.global_variables_initializer()
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
     # merge summary
     summary_op = tf.summary.merge_all()
 
@@ -84,7 +92,11 @@ def training():
 
                 # train data batch
                 train_img, train_label = sess.run([train_img_batch, train_label_batch])
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
                 # train optimizers, train loss, train accuracy
                 start_time = time.time()
                 _, tra_loss, tra_acc = sess.run([train_op, train_loss, train_acc],
@@ -93,10 +105,17 @@ def training():
 
                 if step % 100 == 0 or (step + 1) == MAX_STEP:
                     sec_per_batch = float(duration)    # training time of a batch
+<<<<<<< HEAD
                     print 'Step {}, train loss = {:.2f}, \
                            train accuracy = {:.2f}%, \
                            sec_per_batch = {:.2f}s'.format(step, tra_loss, tra_acc, sec_per_batch)
 
+=======
+                    print 'Step %d, train loss = %.2f, train accuracy = %.2f%%, sec_per_batch = %.2fs' %(step,
+                                                                                                 tra_loss, tra_acc,
+                                                                                                 sec_per_batch)
+                    
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
                 if step % 500 == 0 or (step + 1) == MAX_STEP:
                     # validation
                     val_img, val_label = sess.run([val_img_batch, val_label_batch])
@@ -120,7 +139,11 @@ def training():
             print 'Done training, epoch limit reached'
         finally:
             coord.request_stop()
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
         coord.join(threads)
 
 

@@ -3,7 +3,7 @@
 """
 Split data to train, validation and test.
 Convert to TFRecords file
-Read and decode TFRecords file, create a input op for graph
+Read and decode TFRecords file, create a input op for graph.
 
 @author: liangyu
 """
@@ -96,8 +96,8 @@ def convert_to_TFRecord(images, labels, save_dir, name):
     ----------
         images : list of image path, string
         labels : list of labels, int
-        save_dir : the directory to save TFRecord file'
-        name : the name of TFRecord file, string, e.g.: 'train'
+        save_dir : str, the directory to save TFRecord file
+        name : str, the name of TFRecord file
 
     Returns:
     --------
@@ -133,21 +133,35 @@ def read_and_decode(TFRecord_file, batch_size, one_hot, standardize=True):
     """Read and decode TFRecord
 
     Parameters:
+<<<<<<< HEAD
     -----------
+=======
+    ----------
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
         TFRecord_file : filename of TFRecord file, str
         batch_size : batch size, int
         one_hot : label one hot
         standard : Standardize the figure
 
     Returns:
+<<<<<<< HEAD
     --------
         image_batch : a batch of image
         label_batch : a batch of label, one hot or not
+=======
+        image_batch : a batch of image
+        label_batch : a batch of label, one hot or not
+    -------
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
     """
     # queue
     filename_queue = tf.train.string_input_producer([TFRecord_file])
     # reader
+<<<<<<< HEAD
     reader = tf.TFRecordReader()
+=======
+    reader = tf.TFRecordReader()
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
     _, serialized_example = reader.read(filename_queue)
     features = tf.parse_single_example(serialized_example,
                                        features={
@@ -162,7 +176,11 @@ def read_and_decode(TFRecord_file, batch_size, one_hot, standardize=True):
     ############################################################################
     # data augmentation here
     ############################################################################
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
     # reshape
     image = tf.reshape(image, [128, 128, 3])
     # standardization
@@ -176,7 +194,11 @@ def read_and_decode(TFRecord_file, batch_size, one_hot, standardize=True):
                                                 batch_size=batch_size,
                                                 num_threads=4,
                                                 capacity=10000)    # capacity
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
     # one hot
     if one_hot:
         n_classes = NUM_CLASSES
@@ -184,9 +206,15 @@ def read_and_decode(TFRecord_file, batch_size, one_hot, standardize=True):
         label_batch = tf.reshape(label_batch, [batch_size, n_classes])
     else:
         label_batch = tf.reshape(label_batch, [batch_size])
+<<<<<<< HEAD
 
     label_batch = tf.cast(label_batch, tf.int32)    # label tf.int32
 
+=======
+
+    label_batch = tf.cast(label_batch, tf.int32)    # label tf.int32
+
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
     return image_batch, label_batch
 
 
@@ -195,7 +223,11 @@ if __name__ == '__main__':
     # figure dir
     project_dir = os.getcwd()
     figure_dir = os.path.join(project_dir, 'figure')
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
     # get list of images path and list of labels
     train_img, train_labels, val_img, val_labels, test_img, test_labels = getDatafile(figure_dir,
                                                                                       train_size=0.67,

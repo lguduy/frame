@@ -48,13 +48,20 @@ def preprocess_figure(init_figure_dir, init_figure_filename, new_figure_dir, fig
     """
     1. 裁边. 长宽不等，且width方向有黑边，剪裁为长宽相等的图片
     2. resize. 考虑到原图片尺寸太大，网络模型参数太多，resize到 128 × 128 × 3
+<<<<<<< HEAD
 
     Parameters:
     -----------
+=======
+    
+    Parameters:
+    -----------------
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
     init_figure_dir : str, init figure dir
     init_figure_filename : str, init figure filename
     new_figure_dir : str, new figure dir
     figsize : resize figsize
+<<<<<<< HEAD
 
     Return:
     -------
@@ -68,23 +75,51 @@ def preprocess_figure(init_figure_dir, init_figure_filename, new_figure_dir, fig
 
     print 'Done!'
 
+=======
+    
+    Return:
+    ---------
+    """
+    figure = cv2.imread(init_figure_dir +init_figure_filename)
+    figure_cut = figure[:, 83:575, :]                                           # cut   
+    figure_cut_resize = cv2.resize(figure_cut, figsize)            # resize
+    new_figure_path = new_figure_dir + init_figure_filename
+    cv2.imwrite(new_figure_path, figure_cut_resize)
+    
+    print 'Done!' 
+    
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
 
 # Main
 if __name__ == "__main__":
     project_dir = os.getcwd()
     init_figure_dir = os.path.join(project_dir, 'data', 'init_figure/')
     new_figure_dir = os.path.join(project_dir, 'data', 'preprocess_figure/')
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
     # init figure name list
     init_figure_name_list = []
 
     for init_figure_name in os.listdir(os.path.dirname(init_figure_dir)):
         init_figure_name_list.append(init_figure_name)
+<<<<<<< HEAD
 
     print len(init_figure_name_list)
 
+=======
+        
+    print len(init_figure_name_list)
+    
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
     count = 0
     for figure_name in init_figure_name_list:
            preprocess_figure(init_figure_dir, figure_name, new_figure_dir)
            count += 1
            print count
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0

@@ -24,28 +24,47 @@ if __name__ == '__main__':
     # TFRecord file
     TFRecord_file_list = ['train.tfrecords', 'val.tfrecords', 'test.tfrecords']
     TFRecord_file = os.path.join(project_dir, 'cache', TFRecord_file_list[0])
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
     # read and decode TFRecord op
     image_batch, label_batch = read_and_decode(TFRecord_file,
                                                batch_size=BATCH_SIZE,
                                                one_hot=True,
                                                standardize=False)
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
     # test
     with tf.Session() as sess:
         i = 0
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord)
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
         try:
             while not coord.should_stop() and i < 1:
                 # run op
                 img, label = sess.run([image_batch, label_batch])
+<<<<<<< HEAD
 
                 # for visualization
                 img_ = np.uint8(img)              # float to uint8
                 label_ = np.argmax(label, 1)      # one hot to int
 
+=======
+                # for visualization
+                img_ = np.uint8(img)                   # float to uint8
+                label_ = np.argmax(label, 1)      # one hot to int
+                                
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
                 # just test one batch
                 for j in xrange(BATCH_SIZE):
                     print 'label: {}'.format(label_[j])
@@ -53,7 +72,11 @@ if __name__ == '__main__':
                     plt.show()
                 print "Batch size: {}".format(j+1)
                 i+=1
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
         except tf.errors.OutOfRangeError:
             print 'Done!'
         finally:

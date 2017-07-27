@@ -1,6 +1,11 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
+=======
+Created on 2017/6/27 22:08
+
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
 数据：excel表格，火焰图像对应的传感器测量的过程变量
 
 @author: liangyu
@@ -88,7 +93,11 @@ axes.set_ylim(0, 8)
 # save
 plt.savefig('./figure_', dpi = 1000)
 
+<<<<<<< HEAD
 #
+=======
+# 
+>>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
 use_data_remove_match['label'] = -1
 
 for i in range(use_data_remove_match.shape[0]):
