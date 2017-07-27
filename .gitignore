@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Jupyter Notebook
+.ipynb_checkpoints
+.ipynb
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Custom
+cache/
+data/
+figure/
+plot/
+
