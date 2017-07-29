@@ -21,15 +21,9 @@ NUM_CLASSES = 11
 
 def evaluation():
     """Evaluation the model using test data.
-<<<<<<< HEAD
 
     Returns:
     --------
-=======
-    
-    Returns:
-    ------------
->>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
         test_accuracy : test accuracy
     """
     project_dir = os.getcwd()   # project dir
@@ -48,19 +42,11 @@ def evaluation():
                                             batch_size=TEST_BATCH_SIZE,
                                             n_classes=NUM_CLASSES,
                                             visualize=True)
-<<<<<<< HEAD
 
         test_logits_ = tf.argmax(test_logits, 1)
         test_label_batch_ = tf.argmax(test_label_batch, 1)
         top_one_op = tf.nn.in_top_k(test_logits, test_label_batch_, 1)
 
-=======
-       
-        test_logits_ = tf.argmax(test_logits, 1)
-        test_label_batch_ = tf.argmax(test_label_batch, 1)
-        top_one_op = tf.nn.in_top_k(test_logits, test_label_batch_, 1)
-        
->>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
         # init saver
         saver = tf.train.Saver()
 
@@ -75,17 +61,10 @@ def evaluation():
             else:
                 print 'No checkpoint file found in {}'.format(checkpoint_dir)
                 return
-<<<<<<< HEAD
 
             coord = tf.train.Coordinator()
             threads = tf.train.start_queue_runners(sess = sess, coord = coord)
 
-=======
-            
-            coord = tf.train.Coordinator()
-            threads = tf.train.start_queue_runners(sess = sess, coord = coord)
-            
->>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
             try:
                 num_iter = num_test    # batch_size = 1
                 true_count = 0
@@ -93,21 +72,13 @@ def evaluation():
 
                 while step < num_iter and not coord.should_stop():
                     predictions = sess.run([top_one_op])
-<<<<<<< HEAD
 
-=======
-                    
->>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
                     if np.sum(predictions) == 0:
                         print 'true label: {}, predict label: {}'.format(test_label_batch_.eval(),
                                            test_logits_.eval())
                     true_count += np.sum(predictions)
                     step += 1
-<<<<<<< HEAD
 
-=======
-                    
->>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
                 test_accuracy = float(true_count) / num_test
                 print 'Test accuracy = {:.4f}'.format(test_accuracy)
             except Exception as e:
@@ -115,15 +86,9 @@ def evaluation():
             finally:
                 coord.request_stop()
                 coord.join(threads)
-<<<<<<< HEAD
 
     return test_accuracy
 
-=======
-    
-    return test_accuracy
-                
->>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
 # Main
 if __name__ == '__main__':
     # test

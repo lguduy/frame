@@ -133,88 +133,62 @@ def read_and_decode(TFRecord_file, batch_size, one_hot, standardize=True):
     """Read and decode TFRecord
 
     Parameters:
-<<<<<<< HEAD
     -----------
-=======
-    ----------
->>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
         TFRecord_file : filename of TFRecord file, str
         batch_size : batch size, int
         one_hot : label one hot
         standard : Standardize the figure
 
     Returns:
-<<<<<<< HEAD
     --------
         image_batch : a batch of image
         label_batch : a batch of label, one hot or not
-=======
-        image_batch : a batch of image
-        label_batch : a batch of label, one hot or not
-    -------
->>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
     """
-    # queue
-    filename_queue = tf.train.string_input_producer([TFRecord_file])
-    # reader
-<<<<<<< HEAD
-    reader = tf.TFRecordReader()
-=======
-    reader = tf.TFRecordReader()
->>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
-    _, serialized_example = reader.read(filename_queue)
-    features = tf.parse_single_example(serialized_example,
-                                       features={
-                                           'label': tf.FixedLenFeature([], tf.int64),
-                                           'image_raw': tf.FixedLenFeature([], tf.string),
-                                       })
-    # image decode
-    image = tf.decode_raw(features['image_raw'], tf.uint8)    # image tf.uini8
-    # image cast
-    image = tf.cast(image, tf.float32)                        # image tf.float32
+    # tf.name_scope('input') tensorboard
+    with tf.name_scope('input') as scope:
+        # queue
+        filename_queue = tf.train.string_input_producer([TFRecord_file])
+        # reader
+        reader = tf.TFRecordReader()
+        key, values = reader.read(filename_queue)
+        features = tf.parse_single_example(values,
+                                           features={
+                                               'label': tf.FixedLenFeature([], tf.int64),
+                                               'image_raw': tf.FixedLenFeature([], tf.string),
+                                           })
+        # image decode
+        image = tf.decode_raw(features['image_raw'], tf.uint8)    # image tf.uini8
+        # image cast
+        image = tf.cast(image, tf.float32)                        # image tf.float32
 
-    ############################################################################
-    # data augmentation here
-    ############################################################################
-<<<<<<< HEAD
+        ############################################################################
+        # data augmentation here
+        ############################################################################
 
-=======
+        # reshape
+        image = tf.reshape(image, [128, 128, 3])
+        # standardization
+        if standardize:
+            image = tf.image.per_image_standardization(image)
 
->>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
-    # reshape
-    image = tf.reshape(image, [128, 128, 3])
-    # standardization
-    if standardize:
-        image = tf.image.per_image_standardization(image)
+        # label
+        label = tf.cast(features['label'], tf.int32)    # label tf.int32
+        # image batch, label batch
+        image_batch, label_batch = tf.train.batch([image, label],
+                                                    batch_size=batch_size,
+                                                    num_threads=4,
+                                                    capacity=10000)    # capacity
 
-    # label
-    label = tf.cast(features['label'], tf.int32)    # label tf.int32
-    # image batch, label batch
-    image_batch, label_batch = tf.train.batch([image, label],
-                                                batch_size=batch_size,
-                                                num_threads=4,
-                                                capacity=10000)    # capacity
-<<<<<<< HEAD
+        # one hot
+        if one_hot:
+            n_classes = NUM_CLASSES
+            label_batch = tf.one_hot(label_batch, depth=n_classes)
+            label_batch = tf.reshape(label_batch, [batch_size, n_classes])
+        else:
+            label_batch = tf.reshape(label_batch, [batch_size])
 
-=======
+        label_batch = tf.cast(label_batch, tf.int32)    # label tf.int32
 
->>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
-    # one hot
-    if one_hot:
-        n_classes = NUM_CLASSES
-        label_batch = tf.one_hot(label_batch, depth=n_classes)
-        label_batch = tf.reshape(label_batch, [batch_size, n_classes])
-    else:
-        label_batch = tf.reshape(label_batch, [batch_size])
-<<<<<<< HEAD
-
-    label_batch = tf.cast(label_batch, tf.int32)    # label tf.int32
-
-=======
-
-    label_batch = tf.cast(label_batch, tf.int32)    # label tf.int32
-
->>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
     return image_batch, label_batch
 
 
@@ -223,11 +197,7 @@ if __name__ == '__main__':
     # figure dir
     project_dir = os.getcwd()
     figure_dir = os.path.join(project_dir, 'figure')
-<<<<<<< HEAD
 
-=======
-
->>>>>>> c80ea2e7674560a2cf52dd7ca54862f4c7379dd0
     # get list of images path and list of labels
     train_img, train_labels, val_img, val_labels, test_img, test_labels = getDatafile(figure_dir,
                                                                                       train_size=0.67,
