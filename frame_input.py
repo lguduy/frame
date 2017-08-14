@@ -111,7 +111,7 @@ def convert_to_TFRecord(images, labels, save_dir, name):
         raise ValueError('Images size {} does not match label size {}'.format(images.shape[0], n_samples))
 
     writer = tf.python_io.TFRecordWriter(filename)       #  TFRecordWriter class
-    print '\nTransform start...'
+    print 'Convert to TFRecords...'
     for i in xrange(0, n_samples):
         try:
             image = plt.imread(images[i])                # type(image) must be array
@@ -126,7 +126,7 @@ def convert_to_TFRecord(images, labels, save_dir, name):
             print 'error: {}'.format(e)
             print 'Skip it!\n'
     writer.close()
-    print 'Transform done!'
+    print 'Done'
 
 
 def read_and_decode(TFRecord_file, batch_size, one_hot, standardize=True):
@@ -145,7 +145,7 @@ def read_and_decode(TFRecord_file, batch_size, one_hot, standardize=True):
         label_batch : a batch of label, one hot or not
     """
     # tf.name_scope('input') tensorboard
-    with tf.name_scope('input') as scope:
+    with tf.name_scope('input'):
         # queue
         filename_queue = tf.train.string_input_producer([TFRecord_file])
         # reader

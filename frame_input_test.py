@@ -1,8 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-Created on 2017/7/23 10:00
-
 frame_input test and plot
 
 @author: liangyu
@@ -18,7 +16,7 @@ from frame.frame_input import read_and_decode
 
 if __name__ == '__main__':
     # test read TFRecord
-    BATCH_SIZE = 16
+    BATCH_SIZE = 6
     # file dir
     project_dir = os.getcwd()
     # TFRecord file
@@ -35,7 +33,7 @@ if __name__ == '__main__':
     with tf.Session() as sess:
         i = 0
         coord = tf.train.Coordinator()
-        threads = tf.train.start_queue_runners(coord=coord)
+        threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
         try:
             while not coord.should_stop() and i < 1:

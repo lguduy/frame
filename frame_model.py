@@ -26,7 +26,7 @@ def _activation_summary(activations):
     """
     tensor_name = activations.op.name
     # tf.summary
-    tf.summary.histogram(tensor_name + '/activation', activations)
+    tf.summary.histogram(tensor_name + '/histogram', activations)
     tf.summary.scalar(tensor_name + '/sparsity', tf.nn.zero_fraction(activations))
 
 
@@ -44,9 +44,10 @@ def _weight_summary(weights, bias):
     --------
         no return
     """
-    op_name = weights.op.name
-    tf.summary.histogram(op_name + '/weights', weights)
-    tf.summary.histogram(op_name + '/bias', bias)
+    op_name_weights = weights.op.name
+    op_name_bias = bias.op.name
+    tf.summary.histogram(op_name_weights + '/histogram', weights)
+    tf.summary.histogram(op_name_bias + '/histogram', bias)
 
 
 def inference(images, batch_size, n_classes, visualize):
@@ -64,11 +65,11 @@ def inference(images, batch_size, n_classes, visualize):
         output tensor with the computed logits, float, [batch_size, n_classes], output of model
     """
     # Conv1 + ReLU, kernal: [3 * 3 * 3, 16], strides: 1
-    with tf.variable_scope('conv1') as scope:
+    with tf.variable_scope('Conv1') as scope:
         kernal = tf.get_variable('weights',
                                   shape=[3, 3, 3, 16],
                                   dtype=tf.float32,
-                                  initializer=tf.truncated_normal_initializer(stddev=0.1,dtype=tf.float32))
+                                  initializer=tf.truncated_normal_initializer(stddev=0.1))
 
         biases = tf.get_variable('biases',
                                  shape=[16],
@@ -76,7 +77,7 @@ def inference(images, batch_size, n_classes, visualize):
                                  initializer=tf.constant_initializer(0.1))
         conv = tf.nn.conv2d(images, kernal, strides=[1,1,1,1], padding='SAME')
         pre_activation = tf.nn.bias_add(conv, biases)
-        conv1 = tf.nn.relu(pre_activation, name=scope.name)
+        conv1 = tf.nn.relu(pre_activation, name='Conv_ReLU')
         _activation_summary(conv1)
         _weight_summary(kernal, biases)
 
@@ -105,7 +106,7 @@ def inference(images, batch_size, n_classes, visualize):
                           beta=0.75, name='norm1')
 
     # Conv2 + ReLU [3 * 3 * 16, 16]
-    with tf.variable_scope('conv2') as scope:
+    with tf.variable_scope('Conv2') as scope:
         kernal = tf.get_variable('weights',
                                   shape=[3, 3, 16, 16],
                                   dtype=tf.float32,
@@ -116,7 +117,8 @@ def inference(images, batch_size, n_classes, visualize):
                                  initializer=tf.constant_initializer(0.1))
         conv = tf.nn.conv2d(norm1, kernal, strides=[1, 1, 1, 1], padding='SAME')
         pre_activation = tf.nn.bias_add(conv, biases)
-        conv2 = tf.nn.relu(pre_activation, name=scope.name)
+        # conv2 op name: conv2/Conv+ReLU
+        conv2 = tf.nn.relu(pre_activation, name='Conv_ReLU')
         _activation_summary(conv2)
         _weight_summary(kernal, biases)
 
@@ -130,11 +132,11 @@ def inference(images, batch_size, n_classes, visualize):
                                  layer2_image1, max_outputs=16)
 
     # Norm2  + Max pool2
-    with tf.variable_scope('pooling1_lrn') as scope:
+    with tf.variable_scope('pooling2_lrn') as scope:
         norm2 = tf.nn.lrn(conv2, depth_radius=4, bias=1.0, alpha=0.001/9.0,
                           beta=0.75, name='norm2')
         pool2 = tf.nn.max_pool(norm2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1],
-                               padding='SAME', name='pooling1')
+                               padding='SAME', name='pooling2')
 
     # local3(Fully Connection, FC)
     with tf.variable_scope('local3') as scope:
@@ -143,12 +145,12 @@ def inference(images, batch_size, n_classes, visualize):
         weights = tf.get_variable('weights',
                                   shape=[dim, 128],
                                   dtype=tf.float32,
-                                  initializer=tf.truncated_normal_initializer(stddev=0.005,dtype=tf.float32))
+                                  initializer=tf.truncated_normal_initializer(stddev=0.04))
         biases = tf.get_variable('biases',
                                  shape=[128],
                                  dtype=tf.float32,
                                  initializer=tf.constant_initializer(0.1))
-        local3 = tf.nn.relu(tf.matmul(reshaped_pool2, weights) + biases, name=scope.name)
+        local3 = tf.nn.relu(tf.matmul(reshaped_pool2, weights) + biases, name='ReLU')
         # summary
         _activation_summary(local3)
         _weight_summary(weights, biases)
@@ -163,14 +165,14 @@ def inference(images, batch_size, n_classes, visualize):
                                  shape=[128],
                                  dtype=tf.float32,
                                  initializer=tf.constant_initializer(0.1))
-        local4 = tf.nn.relu(tf.matmul(local3, weights) + biases, name='local4')
+        local4 = tf.nn.relu(tf.matmul(local3, weights) + biases, name='ReLU')
         # summary
         _activation_summary(local4)
         _weight_summary(weights, biases)
 
-    # softmax
-    with tf.variable_scope('softmax_linear') as scope:
-        weights = tf.get_variable('softmax_linear',
+    # output (softmax)
+    with tf.variable_scope('Output') as scope:
+        weights = tf.get_variable('weights',
                                   shape=[128, n_classes],
                                   dtype=tf.float32,
                                   initializer=tf.truncated_normal_initializer(stddev=0.005,dtype=tf.float32))
@@ -179,7 +181,7 @@ def inference(images, batch_size, n_classes, visualize):
                                  dtype=tf.float32,
                                  initializer=tf.constant_initializer(0.1))
         # not have softmax
-        softmax_linear = tf.add(tf.matmul(local4, weights), biases, name=scope.name)
+        softmax_linear = tf.add(tf.matmul(local4, weights), biases, name='output')
         # summary
         _activation_summary(softmax_linear)
         _weight_summary(weights, biases)
@@ -199,14 +201,14 @@ def losses(logits, labels):
     --------
         loss tensor of float type
     """
-    with tf.variable_scope('loss') as scope:
+    with tf.variable_scope('Loss'):
         # log likelihood cost with labels one hot
         # if labels not one hot , use sparse_softmax_cross_entropy_with_logits()
         cross_entropy = tf.nn.softmax_cross_entropy_with_logits\
-                        (logits=logits, labels=labels, name='xentropy_per_example')
-        loss = tf.reduce_mean(cross_entropy, name=scope.name)
+                        (logits=logits, labels=labels, name='cross_entropy_per_example')
+        loss = tf.reduce_mean(cross_entropy, name='cross_entropy')
         # tf.summary.scalar
-        tf.summary.scalar(scope.name+'/loss', loss)    
+        tf.summary.scalar('loss', loss)
 
     return loss
 
@@ -225,10 +227,12 @@ def trainning(loss, learning_rate):
     --------
         train_op :  operation for trainning
     """
-    with tf.variable_scope('optimizer'):
+    with tf.name_scope('Optimizer'):
         optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)   # Adam
         global_step = tf.Variable(0, name='global_step', trainable=False)
         train_op = optimizer.minimize(loss, global_step=global_step)
+        # tf.summary.scalar
+        tf.summary.scalar('learning_rate', learning_rate)
 
     return train_op
 
@@ -243,14 +247,14 @@ def evaluation(logits, labels):
 
     Returns:
     --------
-        A scalar int32 tensor with the number of examples (out of batch_size)
-        that were predicted correctly.
+        average accuracy of batch size
     """
-    with tf.variable_scope('accuracy') as scope:
+    with tf.name_scope('Accuracy'):
         labels_ = tf.argmax(labels, 1)                # transform one hot to labels, [batch_size, ]
         top_one = tf.nn.in_top_k(logits, labels_, 1)  # in_top_k
         correct = tf.cast(top_one, tf.float16)
         accuracy = tf.reduce_mean(correct) * 100
         # tf.summary.scalar
-        tf.summary.scalar(scope.name+'/accuracy', accuracy)
+        tf.summary.scalar('accuracy__', accuracy)
+
     return accuracy
