@@ -238,7 +238,7 @@ def trainning(loss, learning_rate):
 
 
 def evaluation(logits, labels):
-    """Get train accuracy.
+    """Get accuracy.
 
     Parameters:
     -----------
@@ -247,7 +247,7 @@ def evaluation(logits, labels):
 
     Returns:
     --------
-        average accuracy of batch size
+        average accuracy of batch size data
     """
     with tf.name_scope('Accuracy'):
         labels_ = tf.argmax(labels, 1)                # transform one hot to labels, [batch_size, ]

@@ -6,6 +6,8 @@ Train and save model
 @author: liangyu
 """
 
+from __future__ import print_function
+
 import tensorflow as tf
 import os
 import time
@@ -34,8 +36,8 @@ def training():
     val_data_path = os.path.join(project_dir, 'cache', 'val.tfrecords')
 
     # logs path
-    logs_train_dir = os.path.join(project_dir, 'logs', 'train/')
-    logs_val_dir = os.path.join(project_dir, 'logs', 'val/')
+    logs_train_dir = os.path.join(project_dir, 'logs_test_', 'train/')
+    logs_val_dir = os.path.join(project_dir, 'logs_test_', 'val/')
 
     with tf.Graph().as_default():
         # read and decode batch data
@@ -43,27 +45,29 @@ def training():
                                                              batch_size=BATCH_SIZE,
                                                              one_hot=ONE_HOT)
         val_img_batch, val_label_batch = read_and_decode(val_data_path,
-                                                             batch_size=BATCH_SIZE,
-                                                             one_hot=ONE_HOT)
+                                                         batch_size=BATCH_SIZE,
+                                                         one_hot=ONE_HOT)
+
+        # placeholder
+        # shape=[NONE, IMG_W, IMG_H, 3] ???
+        image = tf.placeholder(tf.float32, shape=[BATCH_SIZE, IMG_W, IMG_H, 3], name='image')
+        label_ = tf.placeholder(tf.int32, shape=[BATCH_SIZE, N_CLASSES], name='label')    # int32
+
         # model
-        logits = frame_model.inference(train_img_batch, BATCH_SIZE, N_CLASSES, visualize)
-        # loss function
-        loss = frame_model.losses(logits, train_label_batch)
+        logits = frame_model.inference(image, BATCH_SIZE, N_CLASSES, visualize)
+        # loss function    train_label_batch y_
+        loss = frame_model.losses(logits, label_)
         # optimizer
         optimizer = frame_model.trainning(loss, learning_rate)
-        
+
         # evaluation
-        accuracy = frame_model.evaluation(logits, train_label_batch)
+        accuracy = frame_model.evaluation(logits, label_)
 
         # init op
         init_op = tf.global_variables_initializer()
 
         # merge summary
         summary_op = tf.summary.merge_all()
-
-        # placeholder
-        x = tf.placeholder(tf.float32, shape=[BATCH_SIZE, IMG_W, IMG_H, 3])
-        y_ = tf.placeholder(tf.int32, shape=[BATCH_SIZE, N_CLASSES])    # int32
 
         # sess
         with tf.Session() as sess:
@@ -90,31 +94,34 @@ def training():
                     start_time = time.time()
                     # run ops
                     _, tra_loss, tra_accuracy = sess.run([optimizer, loss, accuracy],
-                                                    feed_dict={x: train_img, y_: train_label})
+                                                         feed_dict={image: train_img, label_: train_label})
+
                     duration = time.time() - start_time
-                    
+
                     # print info of training
                     if step % 100 == 0 or (step + 1) == MAX_STEP:
                         sec_per_batch = float(duration)    # training time of a batch
-                        print 'Step {}, train loss = {:.2f}, train accuracy = \
-                        {:.2f}%, sec_per_batch = {:.2f}s'.format(step,
+                        print('Step {}, train loss = {:.2f}, train accuracy =',
+                        '{:.2f}%, sec_per_batch = {:.2f}s'.format(step,
                                                                  tra_loss,
                                                                  tra_accuracy,
-                                                                 sec_per_batch)
+                                                                 sec_per_batch))
 
                         # run summary op and write train summary to disk
-                        summary_str = sess.run(summary_op)
+                        summary_str = sess.run(summary_op,
+                                               feed_dict={image: train_img, label_: train_label})
                         train_writer.add_summary(summary_str, step)
 
                     if step % 500 == 0 or (step + 1) == MAX_STEP:
-                        # validation
+                        # val data batch
                         val_img, val_label = sess.run([val_img_batch, val_label_batch])
-                        val_loss, val_acc = sess.run([loss, accuracy],
-                                                     feed_dict={x: val_img, y_: val_label})
-                        print '*** Step {}, val loss = {:.2f}, val accuracy = {:.2f}% ***'.format(step, val_loss, val_acc)
+
+                        # run ops
+                        val_loss, val_acc, summary_str = sess.run([loss, accuracy, summary_op],
+                                                                  feed_dict={image: val_img, label_:val_label})
+                        print('*** Step {}, val loss = {:.2f}, val accuracy = {:.2f}% ***'.format(step, val_loss, val_acc))
 
                         # run summary op and write val summary to disk
-                        summary_str = sess.run(summary_op)
                         val_writer.add_summary(summary_str, step)
 
                     # save model
@@ -123,7 +130,7 @@ def training():
                         saver.save(sess, checkpoint_path, global_step=step)
 
             except tf.errors.OutOfRangeError:
-                print 'Done training -- epoch limit reached'
+                print('Done training -- epoch limit reached')
             finally:
                 coord.request_stop()
 
@@ -134,4 +141,4 @@ def training():
 if __name__ == '__main__':
     start_time = time.time()
     training()
-    print 'Total time: {:.2f}'.format(time.time() - start_time)
+    print('Total time: {:.2f}'.format(time.time() - start_time))
