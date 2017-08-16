@@ -16,12 +16,12 @@ from frame.frame_input import read_and_decode
 
 if __name__ == '__main__':
     # test read TFRecord
-    BATCH_SIZE = 6
+    BATCH_SIZE = 20
     # file dir
     project_dir = os.getcwd()
     # TFRecord file
     TFRecord_file_list = ['train.tfrecords', 'val.tfrecords', 'test.tfrecords']
-    TFRecord_file = os.path.join(project_dir, 'cache', TFRecord_file_list[0])
+    TFRecord_file = os.path.join(project_dir, 'cache', TFRecord_file_list[1])
 
     # read and decode TFRecord op
     image_batch, label_batch = read_and_decode(TFRecord_file,
@@ -56,4 +56,4 @@ if __name__ == '__main__':
             print 'Done!'
         finally:
             coord.request_stop()
-        coord.join(threads)
+            coord.join(threads)

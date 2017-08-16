@@ -1,10 +1,11 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-Evaluation the model using test data
+Evaluation the model using all test data
 
 @author: liangyu
 """
+from __future__ import print_function
 
 import tensorflow as tf
 import os
@@ -35,16 +36,16 @@ def evaluation():
     num_test = 2165
 
     with tf.Graph().as_default():
+        # get test data
         test_img_batch, test_label_batch = read_and_decode(tfrecord_file,
                                                            batch_size=TEST_BATCH_SIZE,
                                                            one_hot=ONE_HOT)
         test_logits = frame_model.inference(test_img_batch,
-                                            batch_size=TEST_BATCH_SIZE,
                                             n_classes=NUM_CLASSES,
                                             visualize=True)
 
         test_logits_ = tf.argmax(test_logits, 1)
-        test_label_batch_ = tf.argmax(test_label_batch, 1)
+        test_label_batch_ = tf.argmax(test_label_batch, 1)    # one hot to label
         top_one_op = tf.nn.in_top_k(test_logits, test_label_batch_, 1)
 
         # init saver
@@ -57,9 +58,9 @@ def evaluation():
                 # Restores from checkpoint
                 saver.restore(sess, ckpt.model_checkpoint_path)
                 global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
-                print 'Checkpoint file has found, global_step: {}'.format(global_step)
+                print('Checkpoint file has found, global_step: {}'.format(global_step))
             else:
-                print 'No checkpoint file found in {}'.format(checkpoint_dir)
+                print('No checkpoint file found in {}'.format(checkpoint_dir))
                 return
 
             coord = tf.train.Coordinator()
@@ -74,13 +75,13 @@ def evaluation():
                     predictions = sess.run([top_one_op])
 
                     if np.sum(predictions) == 0:
-                        print 'true label: {}, predict label: {}'.format(test_label_batch_.eval(),
-                                           test_logits_.eval())
+                        print('true label: {}, predict label: {}'.format(test_label_batch_.eval(),
+                                           test_logits_.eval()))
                     true_count += np.sum(predictions)
                     step += 1
 
-                test_accuracy = float(true_count) / num_test
-                print 'Test accuracy = {:.4f}'.format(test_accuracy)
+                test_accuracy = float(true_count) / num_test * 100
+                print('Total image: {}, test accuracy = {:.2f}%'.format(num_test, test_accuracy))
             except Exception as e:
                 coord.request_stop(e)
             finally:
