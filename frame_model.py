@@ -50,13 +50,12 @@ def _weight_summary(weights, bias):
     tf.summary.histogram(op_name_bias + '/histogram', bias)
 
 
-def inference(images, batch_size, n_classes, visualize):
+def inference(images, n_classes, visualize):
     """Build the model
 
     Parameters:
     -----------
         images : image batch, 4D tensor, tf.float32, [batch_size, width, height, channels]
-        batch_size : batch size
         n_classes : number of classes, number of model output
         visualize : bool, visualize kernal and activations of conv
 
@@ -140,8 +139,10 @@ def inference(images, batch_size, n_classes, visualize):
 
     # local3(Fully Connection, FC)
     with tf.variable_scope('local3') as scope:
-        reshaped_pool2 = tf.reshape(pool2, shape=[batch_size, -1])   # reshape pool2
-        dim = reshaped_pool2.get_shape()[1].value
+        # reshape pool to [batch_size * dim]
+        dim = int(pool2.get_shape()[1]) * int(pool2.get_shape()[2]) * int(pool2.get_shape()[3])
+        reshaped_pool2 = tf.reshape(pool2, [-1, dim])
+
         weights = tf.get_variable('weights',
                                   shape=[dim, 128],
                                   dtype=tf.float32,
